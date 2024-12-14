@@ -154,7 +154,7 @@ class ImageUploader {
         body: JSON.stringify({
           model: "command-xlarge-nightly",
           prompt: `Find related texts for: ${text}`,
-          max_tokens: 50,
+          max_tokens: 200,
           temperature: 0.5,
         }),
       });
