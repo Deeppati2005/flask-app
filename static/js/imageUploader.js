@@ -150,7 +150,11 @@ async function findRelatedTexts(text) {
       },
       body: JSON.stringify({
         model: "command-xlarge-nightly",
-        prompt: `Find related texts for: ${text}`,
+        prompt: `Given the random input '${text}', generate a meaningful medical term, such as the name of a drug or treatment, 
+          by interpreting the input phonetically or structurally. 
+          Adjust unpronounceable or random fragments into recognizable components commonly used in the medical or pharmaceutical field.
+          If you cant find any related words, generate drug-names having at-least 2 characters same as the word supplied
+          Output should be like "Word1, Word2, ...", or "No related words found".`,
         max_tokens: 800,
         temperature: 0.5,
       }),
