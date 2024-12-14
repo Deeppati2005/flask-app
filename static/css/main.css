@@ -217,3 +217,47 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.medicine {
+  margin-bottom: 20px;
+}
+
+.medicine div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.medicine h4 {
+  margin-right: 10px;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.related-texts-container {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid rgb(14, 14, 226);
+  border-radius: 5px;
+  background-color: rgb(13, 13, 180);
+}
+
+.related-texts-container h4 {
+  margin-bottom: 10px;
+}
+
+.related-texts p {
+  margin: 0;
+  padding: 5px 0;
+}

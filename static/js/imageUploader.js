@@ -114,21 +114,76 @@ class ImageUploader {
       this.submitBtn.classList.remove("loading");
     }
   }
-
   displayResults(results) {
     const medicineDiv = document.querySelector(".medicine");
+    const relatedDiv = document.querySelector(".related-texts");
     medicineDiv.innerHTML = ""; // Clear previous results
+    relatedDiv.innerHTML = ""; // Clear related texts
 
     if (!results.length) {
-        medicineDiv.innerHTML = "<h4>No text found</h4>";
-        return;
+      medicineDiv.innerHTML = "<h4>No text found</h4>";
+      return;
     }
 
     results.forEach((item) => {
-        const h4 = document.createElement("h4");
-        h4.textContent = `${item.text} (Confidence: ${item.confidence})`;
-        medicineDiv.appendChild(h4);
+      const h4 = document.createElement("h4");
+      h4.textContent = `${item.text} (Confidence: ${item.confidence})`;
+
+      const button = document.createElement("button");
+      button.textContent = "Find Related";
+      button.addEventListener("click", () => {
+        alert("Scroll down to the 'Related Texts' section to see the results.");
+        this.findRelatedTexts(item.text);
+      });
+      const div = document.createElement("div");
+      div.appendChild(h4);
+      div.appendChild(button);
+
+      medicineDiv.appendChild(div);
     });
+  }
+
+  async findRelatedTexts(text) {
+    try {
+      const response = await fetch("https://api.cohere.ai/v1/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer m46txx67yL3h9wK1fvsDMwfGO6g0htuWxjoEZ5Bx",
+        },
+        body: JSON.stringify({
+          model: "command-xlarge-nightly",
+          prompt: `Find related texts for: ${text}`,
+          max_tokens: 50,
+          temperature: 0.5,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Network response was not ok: ${response.status} - ${errorText}`
+        );
+      }
+
+      const data = await response.json();
+      this.displayRelatedTexts(data.generations[0].text);
+    } catch (error) {
+      alert("Error fetching related texts. Please try again: " + error.message);
+    }
+  }
+
+  displayRelatedTexts(relatedTexts) {
+    const relatedDiv = document.querySelector(".related-texts");
+    relatedDiv.innerHTML = ""; // Clear previous results
+
+    const p = document.createElement("p");
+    p.textContent = relatedTexts;
+    relatedDiv.appendChild(p);
+    // Scroll to the related texts section
+    document
+      .querySelector(".related-texts")
+      .scrollIntoView({ behavior: "smooth" });
   }
 }
 
