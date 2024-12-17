@@ -142,23 +142,29 @@ function displayResults(results) {
 
 async function findRelatedTexts(text) {
   try {
-    const response = await fetch("https://api.cohere.ai/v1/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer m46txx67yL3h9wK1fvsDMwfGO6g0htuWxjoEZ5Bx",
-      },
-      body: JSON.stringify({
-        model: "command-xlarge-nightly",
-        prompt: `Given the random input '${text}', generate a meaningful medical term, such as the name of a drug or treatment, 
-          by interpreting the input phonetically or structurally. 
-          Adjust unpronounceable or random fragments into recognizable components commonly used in the medical or pharmaceutical field.
-          If you cant find any related words, generate drug-names having at-least 2 characters same as the word supplied
-          Output should be like "Word1, Word2, ...", or "No related words found".`,
-        max_tokens: 800,
-        temperature: 0.5,
-      }),
-    });
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB45-FPm_vNBZVYnnwxSDREAcl2NB2IIQ0",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Given the random input '${text}', generate meaningful names of drugs or medicines by interpreting the input phonetically or structurally. Adjust unpronounceable or random fragments into recognizable components commonly used in the medical or pharmaceutical field.
+IMPORTANT: Output should be in this format with no additional texts:
+Word1 : 1 line description about Word1
+Word2 : 1 line description about Word2`,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -168,7 +174,12 @@ async function findRelatedTexts(text) {
     }
 
     const data = await response.json();
-    displayRelatedTexts(data.generations[0].text);
+
+    // Extract the text from the Gemini API response
+    const generatedText =
+      data.candidates[0]?.content?.parts[0]?.text || "No related words found";
+
+    displayRelatedTexts(generatedText);
   } catch (error) {
     alert("Error fetching related texts. Please try again: " + error.message);
   }
@@ -177,9 +188,15 @@ async function findRelatedTexts(text) {
 function displayRelatedTexts(relatedTexts) {
   relatedDiv.innerHTML = ""; // Clear previous results
 
-  const p = document.createElement("p");
-  p.textContent = relatedTexts;
-  relatedDiv.appendChild(p);
+  // Split the text into lines by newline characters
+  const lines = relatedTexts.split("\n").filter((line) => line.trim() !== "");
+
+  // Create a paragraph for each line
+  lines.forEach((line) => {
+    const p = document.createElement("p");
+    p.textContent = line.trim();
+    relatedDiv.appendChild(p);
+  });
 
   // Scroll to the related texts section
   relatedDiv.scrollIntoView({ behavior: "smooth" });
