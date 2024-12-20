@@ -171,7 +171,7 @@ function displayResults(results) {
 async function findRelatedTexts(text) {
   try {
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB45-FPm_vNBZVYnnwxSDREAcl2NB2IIQ0",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyAhXp2FInM5Dpho1jpeJbpE-yI8Qyi-87c",
       {
         method: "POST",
         headers: {
