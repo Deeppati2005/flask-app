@@ -9,6 +9,7 @@ const medicineDiv = document.querySelector(".medicine");
 const relatedDiv = document.querySelector(".related-texts");
 
 let selectedFile = null; // To store the selected file
+let cropper = null; // To store the cropper instance
 
 // Add event listeners
 function initializeEventListeners() {
@@ -70,6 +71,21 @@ function previewFile(file) {
     preview.src = e.target.result;
     uploader.style.display = "none";
     previewContainer.hidden = false;
+
+    // Initialize cropping functionality
+    if (cropper) {
+      cropper.destroy(); // Destroy previous cropper instance if any
+    }
+
+    cropper = new Cropper(preview, {
+      aspectRatio: 16 / 9, // You can change this ratio as needed
+      viewMode: 1,
+      minContainerWidth: 300,
+      minContainerHeight: 200,
+      autoCropArea: 0.5,
+      responsive: true,
+      checkOrientation: false,
+    });
   };
   reader.readAsDataURL(file);
   selectedFile = file; // Store the file
@@ -81,35 +97,43 @@ function clearPreview() {
   uploader.style.display = "block";
   fileInput.value = "";
   selectedFile = null; // Clear the stored file
+
+  if (cropper) {
+    cropper.destroy(); // Destroy the cropper instance
+    cropper = null;
+  }
 }
 
 async function handleSubmit() {
   submitBtn.disabled = true;
   submitBtn.classList.add("loading");
 
-  const formData = new FormData();
-  formData.append("file", selectedFile);
+  const canvas = cropper.getCroppedCanvas(); // Get the cropped image as a canvas
+  canvas.toBlob(async (blob) => {
+    const formData = new FormData();
+    formData.append("file", blob, selectedFile.name);
 
-  try {
-    const response = await fetch("/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      alert("Image processed successfully!");
+      displayResults(result);
+      clearPreview();
+    } catch (error) {
+      alert("Error processing image. Please try again: " + error.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("loading");
     }
-
-    const result = await response.json();
-    alert("Image processed successfully!");
-    displayResults(result);
-    clearPreview();
-  } catch (error) {
-    alert("Error processing image. Please try again: " + error.message);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.classList.remove("loading");
-  }
+  });
 }
 
 function displayResults(results) {
