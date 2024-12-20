@@ -78,13 +78,17 @@ function previewFile(file) {
     }
 
     cropper = new Cropper(preview, {
-      aspectRatio: 16 / 9, // You can change this ratio as needed
-      viewMode: 1,
-      minContainerWidth: 300,
+      aspectRatio: NaN, // Remove the fixed aspect ratio
+      viewMode: 1, // Keep the view mode (you can adjust if needed)
+      minContainerWidth: 300, // Set your minimum container size
       minContainerHeight: 200,
-      autoCropArea: 0.5,
-      responsive: true,
-      checkOrientation: false,
+      autoCropArea: 0.5, // Set the initial auto-crop area
+      responsive: true, // Enable responsiveness
+      checkOrientation: false, // Disable orientation check if not needed
+      movable: true, // Allow image movement
+      scalable: true, // Allow scaling
+      zoomable: true, // Enable zoom functionality
+      rotatable: true, // Allow image rotation
     });
   };
   reader.readAsDataURL(file);
